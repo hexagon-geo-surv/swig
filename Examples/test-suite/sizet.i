@@ -3,10 +3,6 @@
 #include <vector>
 %}
 
-#ifndef SWIGCHICKEN
-%include "std_common.i"
-#endif
-
 %inline
 {
   size_t test1(size_t s)
