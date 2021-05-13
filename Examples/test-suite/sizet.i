@@ -3,6 +3,8 @@
 #include <vector>
 %}
 
+%include "std_common.i"
+
 %inline
 {
   size_t test1(size_t s)
