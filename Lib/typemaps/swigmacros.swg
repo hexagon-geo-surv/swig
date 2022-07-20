@@ -109,11 +109,16 @@ nocppval
 #endif
 %enddef
 
-/* insert the SWIGVERSION in the interface and the wrapper code */
+/* Define SWIG_VERSION in the interface and the wrapper code.
+ * Best practice is to use SWIG-time checks for SWIG_VERSION, but SWIG_VERSION
+ * was unintentionally defined like this for many years, and while it was never
+ * documented there are likely user interface files which rely on it.
+ */
 #if SWIG_VERSION
 %insert("header") {
-%define_as(SWIGVERSION,  SWIG_VERSION)
-%#define SWIG_VERSION SWIGVERSION
+%define_as(SWIG_VERSION_, SWIG_VERSION)
+%#define SWIG_VERSION SWIG_VERSION_
+%#undef SWIG_VERSION_
 }
 #endif
 
