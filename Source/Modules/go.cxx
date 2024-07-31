@@ -1977,7 +1977,7 @@ private:
       return SWIG_NOWRAP;
     }
 
-    String *rawval = Getattr(n, "rawval");
+    String *rawval = Getattr(n, "rawval"); // FIXME
     if (rawval && Len(rawval)) {
       // Based on Swig_VargetToFunction
       String *nname = NewStringf("(%s)", rawval);
@@ -1996,27 +1996,11 @@ private:
       String *get = NewString("");
       Printv(get, Swig_cresult_name(), " = ", NULL);
 
-      char quote;
-      if (Getattr(n, "wrappedasconstant")) {
-        quote = '\0';
-      } else if (SwigType_type(type) == T_CHAR) {
-        quote = '\'';
-      } else if (SwigType_type(type) == T_STRING) {
+      if (SwigType_type(type) == T_STRING) {
         Printv(get, "(char *)", NULL);
-        quote = '"';
-      } else {
-        quote = '\0';
-      }
-
-      if (quote != '\0') {
-        Printf(get, "%c", quote);
       }
 
       Printv(get, Getattr(n, "value"), NULL);
-
-      if (quote != '\0') {
-        Printf(get, "%c", quote);
-      }
 
       Printv(get, ";\n", NULL);
 

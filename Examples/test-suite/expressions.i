@@ -18,4 +18,8 @@ struct A
     // SWIG 4.2.0 and earlier.
     int g(bool b = (compl 1 or not 2) xor (3 and 4) xor (3 bitand 6) xor (3 bitor 5) xor (2 + 2 not_eq 5)) { return (int)b; }
 };
+
+unsigned char x[sizeof"hello world"];
+unsigned char y[sizeof("hello world")];
+
 %}

@@ -211,6 +211,21 @@ int main(int margc, char **margv) {
   int i;
   const TargetLanguageModule *language_module = 0;
 
+  if (getenv("OLLYTEST")) {
+  Swig_init();
+
+  String * qq = NewString("Hello\tW");
+  Putc('\0', qq);
+  Append(qq, "40rld!");
+  Printf(stdout, "%s\n", Swig_string_escape(qq));
+  Printf(stdout, "%d\n%s\n%(escape)s\n", Len(qq), qq, qq);
+  for (i = 0; i != Len(qq); ++i) {
+      Printf(stdout, "<%d> ", Char(qq)[i]);
+  }
+  Printf(stdout, "\n");
+  return 0;
+  }
+
   int argc;
   char **argv;
 

@@ -174,3 +174,18 @@ public:
   }
 %}
 
+#if defined(SWIGJAVA)
+%javaconst(1);
+#elif SWIGCSHARP
+%csconst(1);
+#elif SWIGD
+%dmanifestconst;
+#endif
+
+%inline %{
+struct Test {
+    static const std::string aString = "something";
+};
+%constant std::string MY_STRING = "";
+%constant std::string MY_STRING_2 = "OK";
+%}

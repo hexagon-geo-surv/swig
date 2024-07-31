@@ -998,7 +998,7 @@ static String *expand_macro(String *name, List *args, String *line_file) {
 	  rep = arg;
 	} else {
 	  Clear(tempa);
-	  Printf(tempa, "\"%s\"", arg);
+	  Printf(tempa, "\"%(escape)s\"", arg);
 	  rep = tempa;
 	}
 	Replace(ns, temp, rep, DOH_REPLACE_ANY);

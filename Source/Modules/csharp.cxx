@@ -1344,9 +1344,12 @@ public:
       const char *val = Equal(Getattr(n, "enumvalue"), "true") ? "1" : "0";
       Setattr(n, "enumvalue", val);
     } else if (swigtype == T_CHAR) {
-      String *val = NewStringf("'%(hexescape)s'", Getattr(n, "enumvalue"));
-      Setattr(n, "enumvalue", val);
-      Delete(val);
+      if (Getattr(n, "enumrawvalue")) {
+	// Default octal escaping no good here.
+	String *val = NewStringf("'%(hexescape)s'", Getattr(n, "enumrawvalue"));
+	Setattr(n, "enumvalue", val);
+	Delete(val);
+      }
     }
 
     {
@@ -1521,16 +1524,24 @@ public:
       Swig_warning(WARN_CSHARP_TYPEMAP_CSWTYPE_UNDEF, input_file, line_number, "No cstype typemap defined for %s\n", SwigType_str(t, 0));
     }
 
-    // Default (octal) escaping is no good - change to hex escaped value
-    String *hexescaped_value = Getattr(n, "rawvalue") ? NewStringf("%(hexescape)s", Getattr(n, "rawvalue")) : 0;
-    // Add the stripped quotes back in
-    String *new_value = NewString("");
-    if (SwigType_type(t) == T_STRING) {
-      Printf(new_value, "\"%s\"", hexescaped_value ? hexescaped_value : Copy(Getattr(n, "value")));
-      Setattr(n, "value", new_value);
-    } else if (SwigType_type(t) == T_CHAR) {
-      Printf(new_value, "\'%s\'", hexescaped_value ? hexescaped_value : Copy(Getattr(n, "value")));
-      Setattr(n, "value", new_value);
+    if (Getattr(n, "rawvalue")) {
+      char quote = 0;
+      switch (SwigType_type(t)) {
+       case T_STRING:
+       case T_WSTRING:
+	quote = '\"';
+	break;
+       case T_CHAR:
+       case T_WCHAR:
+	quote = '\'';
+	break;
+      }
+      if (quote) {
+        // Default (octal) escaping is no good - use hex escaping.
+	String *new_value = NewStringf("%c%(hexescape)s%c", quote, Getattr(n, "rawvalue"), quote);
+	Setattr(n, "value", new_value);
+	Delete(new_value);
+      }
     }
 
     const String *outattributes = Getattr(n, "tmap:cstype:outattributes");
@@ -1571,9 +1582,10 @@ public:
       // Alternative constant handling will use the C syntax to make a true C# constant and hope that it compiles as C# code
       if (Getattr(n, "wrappedasconstant")) {
 	if (SwigType_type(t) == T_CHAR) {
-	  if (SwigType_type(valuetype) == T_CHAR)
-	    Printf(constants_code, "\'%(hexescape)s\';\n", Getattr(n, "staticmembervariableHandler:value"));
-	  else
+	  // FIXME: rawvalue
+//	  if (SwigType_type(valuetype) == T_CHAR)
+//	    Printf(constants_code, "\'%(hexescape)s\';\n", Getattr(n, "staticmembervariableHandler:value"));
+//	  else
 	    Printf(constants_code, "(char)%s;\n", Getattr(n, "staticmembervariableHandler:value"));
 	} else {
           Printf(constants_code, "%s;\n", Getattr(n, "staticmembervariableHandler:value"));
@@ -1593,7 +1605,6 @@ public:
     }
     // Cleanup
     Swig_restore(n);
-    Delete(new_value);
     Delete(return_type);
     Delete(constants_code);
     return SWIG_OK;

@@ -139,7 +139,7 @@
     size_t ii = 0;
     for (; ii < (size_t)$1_dim0; ++ii) *($1_basetype *)&$1[ii] = *(($1_basetype *)$input + ii);
   } else {
-    %variable_nullref("$type","$name");
+    %variable_nullref("$type", $name);
   }
 }
 
@@ -148,7 +148,7 @@
     size_t ii = 0;
     for (; ii < (size_t)$1_dim0; ++ii) *($1_basetype *)&$1[ii] = *(($1_basetype *)$input + ii);
   } else {
-    %variable_nullref("$type","$name");
+    %variable_nullref("$type", $name);
   }
 }
 
@@ -156,12 +156,12 @@
   $basetype *inp = 0;
   int res = SWIG_ConvertPtr($input, %as_voidptrptr(&inp), $descriptor, %convertptr_flags);
   if (!SWIG_IsOK(res)) {
-    %variable_fail(res, "$type", "$name");
+    %variable_fail(res, "$type", $name);
   } else if (inp) {
     size_t ii = 0;
     for (; ii < (size_t)$1_dim0; ++ii) *($1_basetype *)&$1[ii] = *(($1_basetype *)inp + ii);
   } else {
-    %variable_nullref("$type", "$name");
+    %variable_nullref("$type", $name); // QQQ
   }
 }
 
@@ -176,7 +176,7 @@
       for (; jj < (size_t)$1_dim1; ++jj) $1[ii][jj] = $input[ii][jj];
     }
   } else {
-    %variable_nullref("$type","$name");
+    %variable_nullref("$type", $name);
   }
 }
 
@@ -188,7 +188,7 @@
       for (; jj < (size_t)$1_dim1; ++jj) $1[ii][jj] = $input[ii][jj];
     }
   } else {
-    %variable_nullref("$type","$name");
+    %variable_nullref("$type", $name);
   }
 }
 
@@ -196,7 +196,7 @@
   $basetype (*inp)[$1_dim1] = 0;
   int res = SWIG_ConvertPtr($input, %as_voidptrptr(&inp), $descriptor, %convertptr_flags);
   if (!SWIG_IsOK(res)) {
-    %variable_fail(res, "$type", "$name");
+    %variable_fail(res, "$type", $name);
   } else if (inp) {
     size_t ii = 0;
     for (; ii < (size_t)$1_dim0; ++ii) {
@@ -204,7 +204,7 @@
       for (; jj < (size_t)$1_dim1; ++jj) $1[ii][jj] = inp[ii][jj];
     }
   } else {
-    %variable_nullref("$type", "$name");
+    %variable_nullref("$type", $name); // RRR
   }
 }
 
@@ -214,7 +214,7 @@
   void *argp = 0;
   int res = SWIG_ConvertPtr($input, &argp, $descriptor, %convertptr_flags);  
   if (!SWIG_IsOK(res)) {
-    %variable_fail(res, "$type", "$name");
+    %variable_fail(res, "$type", $name);
   }
   $1 = %reinterpret_cast(argp, $ltype);
 }

@@ -634,17 +634,10 @@ int Language::constantDirective(Node *n) {
     if (!value) {
       value = Copy(name);
     } else {
-      /*      if (checkAttribute(n,"type","char")) {
-         value = NewString(value);
-         } else {
-         value = NewStringf("%(escape)s", value);
-         }
-       */
-      Setattr(n, "rawvalue", value);
-      value = NewStringf("%(escape)s", value);
-      if (!Len(value))
-	Append(value, "\\0");
-      /*      Printf(stdout,"'%s' = '%s'\n", name, value); */
+      String *stringval = Getattr(n, "stringval");
+      if (stringval) {
+	Setattr(n, "rawvalue", stringval);
+      }
     }
     Setattr(n, "value", value);
     this->constantWrapper(n);

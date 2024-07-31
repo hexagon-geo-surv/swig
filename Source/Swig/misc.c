@@ -424,7 +424,7 @@ static String *Swig_string_hexescape(String *s) {
     } else if (!isgraph(c)) {
       if (c < 0)
 	c += UCHAR_MAX + 1;
-      Printf(ns, "\\x%X", c);
+      Printf(ns, "\\x%X", c); // FIXME %02X?  What about hex digits which follow this?
     } else {
       Putc(c, ns);
     }
