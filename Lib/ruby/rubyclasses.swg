@@ -56,8 +56,19 @@ namespace swig {
       SwigGCReferences &s_references = instance();
       s_references._table = 0;
     }
-    static int MarkEntry(st_data_t key, st_data_t, st_data_t) {
-      rb_gc_mark((VALUE)key);
+    static int MarkEntry(st_data_t key, st_data_t value, st_data_t) {
+      /* SWIG_GC_DIAG (temporary): report any registry entry whose object has
+         been freed/moved instead of marking it, so the CI log shows the type
+         and refcount of the offending entry without aborting on it. */
+      VALUE v = (VALUE)key;
+      int t = (int)RB_BUILTIN_TYPE(v);
+      if (t == RUBY_T_NONE || t == RUBY_T_MOVED || t == RUBY_T_ZOMBIE) {
+        fprintf(stderr, "SWIG_GC_DIAG MarkEntry bad type=%d count=%lu key=%p\n",
+                t, (unsigned long)value, (void *)v);
+        fflush(stderr);
+        return ST_CONTINUE;
+      }
+      rb_gc_mark(v);
       return ST_CONTINUE;
     }
     static void MarkReferences(void *) {
@@ -88,6 +99,17 @@ namespace swig {
     void GC_register(VALUE& obj) {
       if (FIXNUM_P(obj) || SPECIAL_CONST_P(obj) || SYMBOL_P(obj))
         return;
+      {
+        /* SWIG_GC_DIAG (temporary): if a stale VALUE is being registered, abort
+           with a backtrace so the CI log shows the C++ call path that produced
+           the dangling reference. */
+        int t = (int)RB_BUILTIN_TYPE(obj);
+        if (t == RUBY_T_NONE || t == RUBY_T_MOVED || t == RUBY_T_ZOMBIE) {
+          fprintf(stderr, "SWIG_GC_DIAG GC_register stale type=%d obj=%p\n", t, (void *)obj);
+          fflush(stderr);
+          rb_bug("SWIG_GC_DIAG GC_register stale type=%d", t);
+        }
+      }
       if (_table) {
         st_data_t count = 0;
         st_lookup(_table, (st_data_t)obj, &count);
