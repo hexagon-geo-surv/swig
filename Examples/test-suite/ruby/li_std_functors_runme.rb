@@ -80,25 +80,24 @@ end
 # the next comparator call dereferences a stale VALUE and segfaults. Exercise it
 # by keeping containers alive across forced compactions.
 if GC.respond_to?(:verify_compaction_references)
-  # DIAGNOSTIC (temporary): amplified to make the flaky compaction crash fire
-  # reliably so the SWIG_GC_DIAG instrumentation can capture it. No GC.stress
-  # (too slow on the runner) - the movement comes from verify_compaction_references.
-  4.times do |pass|
-    maps = Array.new(60) { Li_std_functors::Map.new(proc { |a, b| b < a }) }
-    sets = Array.new(40) { Li_std_functors::Set.new(proc { |a, b| b < a }) }
-    maps.each_with_index { |m, i| m["k#{pass}_#{i}"] = i }
-    sets.each_with_index { |s, i| s.insert("s#{pass}_#{i}") }
-    40.times do |i|
+  # DIAGNOSTIC (temporary): repeat the original (small-heap) compaction block
+  # many times to make the flaky crash fire reliably. GC.stress is kept (it is
+  # what frees objects mid-compaction and triggers the bug); the heap stays
+  # small so each stress GC is cheap.
+  8.times do |pass|
+    maps = Array.new(40) { Li_std_functors::Map.new(proc { |a, b| b < a }) }
+    maps.each_with_index { |m, i| m["k#{i}"] = i }
+    GC.stress = true
+    15.times do |i|
       begin
         GC.verify_compaction_references(:expand_heap => true, :toward => :empty)
       rescue ArgumentError, TypeError
         GC.compact
       end
       maps.each_with_index { |m, j| m["x#{i}_#{j}"] = i }
-      sets.each_with_index { |s, j| s.insert("y#{i}_#{j}") }
-      maps.each { |m| m.to_a }
     end
-    maps = nil; sets = nil
+    GC.stress = false
+    maps = nil
     GC.start
   end
 end
