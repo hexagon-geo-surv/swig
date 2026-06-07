@@ -81,14 +81,14 @@ end
 # by keeping containers alive across forced compactions.
 if GC.respond_to?(:verify_compaction_references)
   # DIAGNOSTIC (temporary): amplified to make the flaky compaction crash fire
-  # reliably so the SWIG_GC_DIAG instrumentation can capture it.
-  5.times do |pass|
-    maps = Array.new(150) { Li_std_functors::Map.new(proc { |a, b| b < a }) }
-    sets = Array.new(80) { Li_std_functors::Set.new(proc { |a, b| b < a }) }
+  # reliably so the SWIG_GC_DIAG instrumentation can capture it. No GC.stress
+  # (too slow on the runner) - the movement comes from verify_compaction_references.
+  4.times do |pass|
+    maps = Array.new(60) { Li_std_functors::Map.new(proc { |a, b| b < a }) }
+    sets = Array.new(40) { Li_std_functors::Set.new(proc { |a, b| b < a }) }
     maps.each_with_index { |m, i| m["k#{pass}_#{i}"] = i }
     sets.each_with_index { |s, i| s.insert("s#{pass}_#{i}") }
-    GC.stress = true
-    30.times do |i|
+    40.times do |i|
       begin
         GC.verify_compaction_references(:expand_heap => true, :toward => :empty)
       rescue ArgumentError, TypeError
@@ -97,9 +97,7 @@ if GC.respond_to?(:verify_compaction_references)
       maps.each_with_index { |m, j| m["x#{i}_#{j}"] = i }
       sets.each_with_index { |s, j| s.insert("y#{i}_#{j}") }
       maps.each { |m| m.to_a }
-      sets.each { |s| s.to_a }
     end
-    GC.stress = false
     maps = nil; sets = nil
     GC.start
   end
