@@ -2133,26 +2133,26 @@ public:
 
     if (value == 0) {
       if (SwigType_ispointer(resolved_type)) {
-	return NewString("None");
+        return NewString("None");
       }
       switch (SwigType_type(resolved_type)) {
-	case T_INT:
-	case T_LONG:
-	case T_SHORT:
-	case T_UINT:
-	case T_USHORT:
-	case T_ULONG:
-	case T_CHAR:
-	case T_SCHAR:
-	case T_UCHAR:
-	case T_WCHAR:
-	case T_FLOAT:
-	case T_DOUBLE:
-	case T_LONGDOUBLE:
-	case T_BOOL:
-	case T_LONGLONG:
-	case T_ULONGLONG:
-	  return NewString("0");
+      case T_INT:
+      case T_LONG:
+      case T_SHORT:
+      case T_UINT:
+      case T_USHORT:
+      case T_ULONG:
+      case T_CHAR:
+      case T_SCHAR:
+      case T_UCHAR:
+      case T_WCHAR:
+      case T_FLOAT:
+      case T_DOUBLE:
+      case T_LONGDOUBLE:
+      case T_BOOL:
+      case T_LONGLONG:
+      case T_ULONGLONG:
+        return NewString("0");
       }
       return NIL;
     }
@@ -2243,40 +2243,40 @@ public:
     String *result = convertDoubleValue(v);
     if (!result) {
       if (Equal(v, "nullptr")) {
-	// nullptr is type nullptr_t which doesn't implicitly convert to 0.
+        // nullptr is type nullptr_t which doesn't implicitly convert to 0.
         result = NewString("None");
       } else if (Equal(v, "NULL")) {
-	// The C and C++ standards both allow the implementation to define NULL
-	// to `0`, and the inadvertent use of NULL as an integer zero is
-	// sometimes seen in code.
-	//
-	// However this use is semantically wrong, and GCC and clang both
-	// define NULL to a magic value which warns if implicitly converted
-	// to an integer, so we only implicitly convert to zero if the type
-	// resolves to a built-in arithmetic type.
-	switch (SwigType_type(unqualified_type)) {
-	  case T_INT:
-	  case T_LONG:
-	  case T_SHORT:
-	  case T_UINT:
-	  case T_USHORT:
-	  case T_ULONG:
-	  case T_CHAR:
-	  case T_SCHAR:
-	  case T_UCHAR:
-	  case T_WCHAR:
-	  case T_FLOAT:
-	  case T_DOUBLE:
-	  case T_LONGDOUBLE:
-	  case T_BOOL:
-	  case T_LONGLONG:
-	  case T_ULONGLONG:
-	    result = NewString("0");
-	    break;
-	  default:
-	    result = NewString("None");
-	    break;
-	}
+        // The C and C++ standards both allow the implementation to define NULL
+        // to `0`, and the inadvertent use of NULL as an integer zero is
+        // sometimes seen in code.
+        //
+        // However this use is semantically wrong, and GCC and clang both
+        // define NULL to a magic value which warns if implicitly converted
+        // to an integer, so we only implicitly convert to zero if the type
+        // resolves to a built-in arithmetic type.
+        switch (SwigType_type(unqualified_type)) {
+        case T_INT:
+        case T_LONG:
+        case T_SHORT:
+        case T_UINT:
+        case T_USHORT:
+        case T_ULONG:
+        case T_CHAR:
+        case T_SCHAR:
+        case T_UCHAR:
+        case T_WCHAR:
+        case T_FLOAT:
+        case T_DOUBLE:
+        case T_LONGDOUBLE:
+        case T_BOOL:
+        case T_LONGLONG:
+        case T_ULONGLONG:
+          result = NewString("0");
+          break;
+        default:
+          result = NewString("None");
+          break;
+        }
       }
       // This could also be an enum type, default value of which could be
       // representable in Python if it doesn't include any scope (which could,

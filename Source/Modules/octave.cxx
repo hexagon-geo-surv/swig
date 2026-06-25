@@ -561,29 +561,29 @@ public:
       // to an integer, so we only implicitly convert to zero if the type
       // resolves to a built-in arithmetic type.
       switch (SwigType_type(unqualified_type)) {
-        case T_INT:
-        case T_LONG:
-        case T_SHORT:
-        case T_UINT:
-        case T_USHORT:
-        case T_ULONG:
-        case T_CHAR:
-        case T_SCHAR:
-        case T_UCHAR:
-        case T_WCHAR:
-        case T_FLOAT:
-        case T_DOUBLE:
-        case T_LONGDOUBLE:
-        case T_BOOL:
-        case T_LONGLONG:
-        case T_ULONGLONG:
-          Delete(resolved_type);
-          Delete(unqualified_type);
-          return NewString("0");
-        default:
-          Delete(resolved_type);
-          Delete(unqualified_type);
-          return NewString("None");
+      case T_INT:
+      case T_LONG:
+      case T_SHORT:
+      case T_UINT:
+      case T_USHORT:
+      case T_ULONG:
+      case T_CHAR:
+      case T_SCHAR:
+      case T_UCHAR:
+      case T_WCHAR:
+      case T_FLOAT:
+      case T_DOUBLE:
+      case T_LONGDOUBLE:
+      case T_BOOL:
+      case T_LONGLONG:
+      case T_ULONGLONG:
+        Delete(resolved_type);
+        Delete(unqualified_type);
+        return NewString("0");
+      default:
+        Delete(resolved_type);
+        Delete(unqualified_type);
+        return NewString("None");
       }
     }
     Delete(resolved_type);
